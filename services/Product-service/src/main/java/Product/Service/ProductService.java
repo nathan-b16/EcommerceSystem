@@ -7,7 +7,6 @@ import Product.Model.ProductResponse;
 import Product.Repository.ProductRepository;
 import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
-import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -64,9 +63,8 @@ public class ProductService {
         mergeProduct(product, request);
     }
 
-    public List<?> purchaseProducts(List<?> request) {
-        //todo
-        return null;
+    public List<?> purchaseProducts(List<PurchaseProductRequest> request) {
+
     }
 
     private void mergeProduct(Product product, ProductRequest request){

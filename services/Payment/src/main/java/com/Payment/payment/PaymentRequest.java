@@ -3,8 +3,7 @@ package com.Payment.payment;
 import java.math.BigDecimal;
 
 public record PaymentRequest(
-
-        Integer id,
+        String id,
         BigDecimal amount,
         PaymentMethod paymentMethod,
         Integer orderId,

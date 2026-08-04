@@ -1,6 +1,6 @@
 package com.Payment.payment;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.mongodb.repository.MongoRepository;
 
-public interface PaymentRepository extends JpaRepository<Payment, Integer> {
+public interface PaymentRepository extends MongoRepository<Payment, String> {
 }

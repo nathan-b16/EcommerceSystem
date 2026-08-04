@@ -11,5 +11,5 @@ import org.springframework.web.bind.annotation.RequestBody;
 public interface PaymentClient {
 
     @PostMapping
-    Integer reqOrderPayment(@RequestBody PaymentRequest request);
+    String createPayment(@RequestBody PaymentRequest request);
 }

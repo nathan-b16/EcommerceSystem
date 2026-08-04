@@ -7,11 +7,8 @@ import com.Order.Orderline.OrderLineRequest;
 import com.Order.Orderline.OrderLineService;
 import com.Order.Payment.PaymentClient;
 import com.Order.Payment.PaymentRequest;
-import com.Order.Product.ProductClient;
 import com.Order.Product.PurchaseRequest;
 import com.Order.Repository.OrderRepository;
-import com.Order.kafka.OrderConfirmation;
-import com.Order.kafka.OrderProducer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -20,18 +17,15 @@ import org.springframework.stereotype.Service;
 public class OrderService {
 
     private final CustomerClient customerClient;
-    private final ProductClient productClient;
     private final OrderRepository repository;
     private final OrderMapper mapper;
     private final OrderLineService orderLineService;
-    private final OrderProducer producer;
     private final PaymentClient paymentClient;
 
     public Integer createOrder(OrderRequest request) {
-        var customer = this.customerClient.findById(request.customerId())
+        var customer = customerClient.findById(request.customerId())
                 .orElseThrow(() -> new OrderException("can't create an order, id is wrong"));
 
-        var purchasedProduct = productClient.purchaseProducts(request.products());
         var order = repository.save(mapper.toOrder(request));
 
         for (PurchaseRequest purchaseRequest : request.products()) { /// לכל מוצר בהזמנה ניצור שורה בDB עם הכמות שהלקוח קנה
@@ -51,17 +45,8 @@ public class OrderService {
                 order.getReference(),
                 customer
         );
-        paymentClient.reqOrderPayment(paymentRequest);
+        paymentClient.createPayment(paymentRequest);
 
-        producer.sendOrderConfirmation(
-                new OrderConfirmation(
-                        request.reference(),
-                        request.totalAmount(),
-                        request.paymentMethod(),
-                        customer,
-                        purchasedProduct
-                )
-        );
         return order.getId();
     }
 }

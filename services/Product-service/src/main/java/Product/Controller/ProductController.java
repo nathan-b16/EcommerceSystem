@@ -3,6 +3,8 @@ package Product.Controller;
 
 import Product.Model.ProductRequest;
 import Product.Model.ProductResponse;
+import Product.Model.PurchaseProductRequest;
+import Product.Model.PurchaseProductResponse;
 import Product.Service.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -38,7 +40,7 @@ public class ProductController {
         return ResponseEntity.ok(service.addProduct(request));
     }
     @PostMapping("/purchase")
-    public ResponseEntity<?> purchaseProducts(@RequestBody List<?> request) { // todo
+    public ResponseEntity<List<PurchaseProductResponse>> purchaseProducts(@RequestBody List<PurchaseProductRequest> request) { // todo
         return ResponseEntity.ok(service.purchaseProducts(request));
     }
 

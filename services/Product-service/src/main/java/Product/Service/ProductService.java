@@ -1,14 +1,13 @@
 package Product.Service;
 
 import Product.Exception.ProductNotFoundException;
-import Product.Model.Product;
-import Product.Model.ProductRequest;
-import Product.Model.ProductResponse;
+import Product.Model.*;
 import Product.Repository.ProductRepository;
 import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -63,8 +62,31 @@ public class ProductService {
         mergeProduct(product, request);
     }
 
-    public List<?> purchaseProducts(List<PurchaseProductRequest> request) {
+    public List<PurchaseProductResponse> purchaseProducts(List<PurchaseProductRequest> request) {
+        var productsIds = request.stream().map(PurchaseProductRequest::productId).distinct().toList();
+        var productsInStock = repository.findAllById(productsIds);
+        var purchased = new ArrayList<PurchaseProductResponse>();
 
+        if(productsIds.size() != productsInStock.size()) {
+            throw new ProductNotFoundException("One or more were not found");
+        }
+        for(int i = 0; i<productsIds.size(); i++) {
+            var product = productsInStock.get(i);
+            if(request.get(i).quantity() > productsInStock.get(i).getQuantity()) {
+                throw new ProductNotFoundException("Short in stock");
+            }
+            var updatedQuantity= product.getQuantity() - request.get(i).quantity();
+            product.setQuantity(updatedQuantity);
+            repository.save(product);
+            purchased.add(new PurchaseProductResponse(
+                    product.getProductId(),
+                    product.getProductName(),
+                    product.getPrice(),
+                    product.getCategory(),
+                    product.getQuantity()
+            ));
+        }
+        return purchased;
     }
 
     private void mergeProduct(Product product, ProductRequest request){

@@ -1,7 +1,6 @@
 package com.Payment.payment;
 
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,8 +16,7 @@ public class PaymentController {
     private final PaymentService paymentService;
 
     @PostMapping
-    public ResponseEntity<Integer> createPayment(@RequestBody @Valid PaymentRequest request){
+    public ResponseEntity<String> createPayment(@RequestBody @Valid PaymentRequest request) {
         return ResponseEntity.ok(paymentService.createPayment(request));
     }
-
 }

@@ -4,7 +4,7 @@ package com.Order.Product;
 import java.math.BigDecimal;
 
 public record PurchaseResponse(
-        Integer productId,
+        String productId,
         String name,
         String description,
         BigDecimal price,

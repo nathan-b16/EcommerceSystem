@@ -10,16 +10,9 @@ spring:
     hibernate:
       ddl-auto: create
     database: postgresql
-    database-platform: org.hibernate.dialect.PostgresSQLDialect #Postgre
-
-  kafka:
-    bootstrap-servers: localhost:9229
-    producer:
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-      properties:
-        spring.json.type.mapping: orderConfirmation:com.Order.kafka.OrderConfirmation,paymentConfirmation:com.Payment.notification.PaymentNotificationRequest
+    database-platform: org.hibernate.dialect.PostgreSQLDialect #Postgre
 application:
   config:
-    product-url: http://localhost:8222/api/v1/products
-    customer-url: http://localhost:8222/api/v1/customers
+    product-url: http://localhost:8050/api/v1/products
+    customer-url: http://localhost:8090/api/v1/customer
+    payment-url: http://localhost:8070/api/v1/payments

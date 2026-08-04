@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public record OrderRequest (
-    Integer Id,
+    Integer id,
     @NotNull(message = "customer id shouldn't null")
     @NotEmpty(message = "customer id shouldn't be blank")
     @NotBlank()

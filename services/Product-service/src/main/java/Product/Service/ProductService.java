@@ -8,7 +8,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
@@ -28,12 +30,11 @@ public class ProductService {
                 .collect(Collectors.toList());
     }
 
-    public  ProductResponse getProductById(String productId) {
-        if(productId == null) return null;
+    public ProductResponse getProductById(String productId) {
         return repository.findById(productId)
                 .map(mapper::fromEntity)
                 .orElseThrow(()-> new ProductNotFoundException(
-                        format("The product you are looking for is not found", productId)
+                        format("The product you are looking for is not found: %s", productId)
                 ));
     }
 
@@ -42,7 +43,7 @@ public class ProductService {
         return product.getProductId();
     }
 
-    public List<ProductResponse> getProductByCategory(Enum category) {
+    public List<ProductResponse> getProductByCategory(ProductCategory category) {
         return repository.findAll()
                 .stream()
                 .filter(c->c.getCategory().equals(category))
@@ -51,6 +52,9 @@ public class ProductService {
     }
 
     public void deleteProductById(String productId) {
+        if (!repository.existsById(productId)) {
+            throw new ProductNotFoundException("No product found with id " + productId);
+        }
         repository.deleteById(productId);
     }
 
@@ -60,23 +64,29 @@ public class ProductService {
                         format("ProductID: %s was not found", request.productId())
                 ));
         mergeProduct(product, request);
+        repository.save(product);
     }
 
     public List<PurchaseProductResponse> purchaseProducts(List<PurchaseProductRequest> request) {
         var productsIds = request.stream().map(PurchaseProductRequest::productId).distinct().toList();
         var productsInStock = repository.findAllById(productsIds);
-        var purchased = new ArrayList<PurchaseProductResponse>();
 
         if(productsIds.size() != productsInStock.size()) {
             throw new ProductNotFoundException("One or more were not found");
         }
-        for(int i = 0; i<productsIds.size(); i++) {
-            var product = productsInStock.get(i);
-            if(request.get(i).quantity() > productsInStock.get(i).getQuantity()) {
+
+        Map<String, Product> productsById = new HashMap<>(); // We map the product by their IDs
+        for(Product product: productsInStock){
+            productsById.put(product.getProductId(), product);
+        }
+
+        var purchased = new ArrayList<PurchaseProductResponse>();
+        for(PurchaseProductRequest req : request){
+            var product = productsById.get(req.productId());
+            if(req.quantity() > product.getQuantity()){
                 throw new ProductNotFoundException("Short in stock");
             }
-            var updatedQuantity= product.getQuantity() - request.get(i).quantity();
-            product.setQuantity(updatedQuantity);
+            product.setQuantity(product.getQuantity() - req.quantity());
             repository.save(product);
             purchased.add(new PurchaseProductResponse(
                     product.getProductId(),
@@ -96,10 +106,10 @@ public class ProductService {
         if(StringUtils.isNotBlank(String.valueOf(request.price()))){
             product.setPrice(request.price());
         }
-        if(StringUtils.isNotBlank(String.valueOf(request.quantity()))){
+        if(request.quantity() != null){
             product.setQuantity(request.quantity());
         }
-        if(StringUtils.isNotBlank(String.valueOf(request.category()))){
+        if(request.category() != null){
             product.setCategory((request.category()));
         }
     }

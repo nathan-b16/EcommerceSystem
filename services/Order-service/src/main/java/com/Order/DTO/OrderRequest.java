@@ -22,5 +22,4 @@ public record OrderRequest (
     PaymentMethod paymentMethod,
     @NotEmpty(message = "You must purchase at least 1 product")
     List<PurchaseRequest> products
-
 ){}

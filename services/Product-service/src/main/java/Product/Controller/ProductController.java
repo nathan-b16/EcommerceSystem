@@ -1,10 +1,7 @@
 package Product.Controller;
 
 
-import Product.Model.ProductRequest;
-import Product.Model.ProductResponse;
-import Product.Model.PurchaseProductRequest;
-import Product.Model.PurchaseProductResponse;
+import Product.Model.*;
 import Product.Service.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,12 +22,12 @@ public class ProductController {
     {
         return ResponseEntity.ok(service.getProduct());
     }
-    @GetMapping("/{id}")
-    public ResponseEntity<ProductResponse> getProductByID(@PathVariable String productId) {
+    @GetMapping("/productInfo/{id}")
+    public ResponseEntity<ProductResponse> getProductByID(@PathVariable("id") String productId) {
         return ResponseEntity.ok(service.getProductById(productId));
     }
-    @GetMapping("/{category}")
-    public ResponseEntity<List<ProductResponse>> getProductByCategory(@PathVariable Enum category){
+    @GetMapping("/category/{category}")
+    public ResponseEntity<List<ProductResponse>> getProductByCategory(@PathVariable("category") ProductCategory category){
         return ResponseEntity.ok(service.getProductByCategory(category));
     }
 
@@ -40,7 +37,7 @@ public class ProductController {
         return ResponseEntity.ok(service.addProduct(request));
     }
     @PostMapping("/purchase")
-    public ResponseEntity<List<PurchaseProductResponse>> purchaseProducts(@RequestBody List<PurchaseProductRequest> request) { // todo
+    public ResponseEntity<List<PurchaseProductResponse>> purchaseProducts(@RequestBody List<PurchaseProductRequest> request) {
         return ResponseEntity.ok(service.purchaseProducts(request));
     }
 
@@ -53,7 +50,7 @@ public class ProductController {
 
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteProduct(@PathVariable String productId){
+    public ResponseEntity<?> deleteProduct(@PathVariable("id") String productId){
         service.deleteProductById(productId);
         return ResponseEntity.accepted().build();
     }

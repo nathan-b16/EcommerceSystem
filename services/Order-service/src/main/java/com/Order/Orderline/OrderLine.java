@@ -19,5 +19,4 @@ public class OrderLine {
         private Order order;
         private String productId;
         private double quantity;
-
 }
